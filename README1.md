@@ -105,13 +105,20 @@ In listen_addresses change localhost to *.
 
 ![image](https://user-images.githubusercontent.com/71873090/153161639-af45318b-b160-4892-a34e-5851e679b02f.png)
 
+3. After that restart PostgreSQL service for changes to take effect.
+
+```$ sudo systemctl restart postgresql```
+
+
+##############################
+firewall
 
 ## Build and deploy
 
 1. Clone a repository `git clone https://github.com/mentorchita/Geocit134.git; cd Geocit134`
 2. In **pom.xml** make changes:
 
-    - add javax in <artifacrId>
+    - add javax in \<artifacrId\>
     
     ```
     <!--Servlet API-->
