@@ -107,11 +107,16 @@ In listen_addresses change localhost to *.
 
 3. After that restart PostgreSQL service for changes to take effect.
 
+
 ```$ sudo systemctl restart postgresql```
 
+4. Add rules to firewall for PostgreSQL service in order for Ubuntu to connect to the database server and restart PostgreSQL to make changes work.
 
-##############################
-firewall
+  ```
+  $ sudo firewall-cmd --add-service=postgresql
+  $ sudo firewall-cmd --add-service=postgresql --permanent
+  $ sudo systemctl restart postgres
+  ```
 
 ## Build and deploy
 
