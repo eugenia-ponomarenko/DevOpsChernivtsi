@@ -200,8 +200,8 @@ In listen_addresses change localhost to *.
 
     serverip='192.168.1.101'
     dbip='192.168.1.102'
-    email='my.mail0001my@gmail.com'
-    emailpasswd='devOps1324@'
+    email='example@gmail.com'
+    emailpasswd='password'
 
 
     # Database IP
