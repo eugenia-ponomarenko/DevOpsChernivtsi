@@ -8,6 +8,65 @@
 - [Ubuntu 18.04](https://codebots.com/docs/ubuntu-18-04-virtual-machine-setup)
 - [CentOS 7.9](https://linuxhint.com/install-centos-7-virtualbox/)
 
+## IP address
+
+### Define Host Only Ethernet Adapter in Virtual Box on my laptop
+ In the VirtualBox client, open menu option File | Host Network Manager. Create a new Virtual Box Host Only Ethernet Adapter (in my case #2). Set an IP address in the range in which you want to assign an IP address to your VM. I have set 192.168.1.100 and I will assign the IP address 192.168.1.101 to the Ubuntu VM and 192.168.1.102 CentOs VM. Do not define a DHCP Server on the second tab.
+ 
+### Enable a network adapter for the specific VM of type Virtual Box Host Only Ethernet Adapter  
+
+Select the VM in the Virtual Box client – before it is started. Press Settings. Click on Network. Open one of the currently unconfigured Adapter tabs. Select the Host Only Ethernet Adapter that was created in the previous step, #2 for me. Check Enable the Network Adapter. Make sure that Promiscuous Mode allows VMs and the checkbox Cable Connected is checked.
+
+#### Ubuntu 
+Configure as a static assignment to the network interface on Ubuntu. To configure system to use a static IP address assignment, add the static method to the inet address family statement for the appropriate interface in the file /etc/network/interfaces. `nano /etc/network/interfaces`
+
+Edit the file, adding the following section:
+
+```
+# My static IP configuration for the VirtualBox Host Only Adapter
+auto enp0s8
+iface enp0s8 inet static
+address 192.168.1.101
+netmask 255.255.255.0
+```
+
+Save the file and restart Network Interface
+
+`$ sudo systemctl restart network`
+
+After that the configuration of network interface enp0s8 will already be active.
+
+#### CentOS
+Configure as a static assignment to the network interface on CentOS. To configure system to use a static IP address assignment, add the static method to the BOOTPROTO for the appropriate interface in the created file /etc/sysconfig/network-scripts. 
+
+```$ sudo nano /etc/sysconfig/network-scripts```
+
+```
+DEVICE="enp0s8"
+ONBOOT=yes
+NETBOOT=yes
+IPADDR=192.168.1.102
+GATEWAY=192.168.1.100
+TYPE=Ethernet
+NERMASJ=255.255.255.0
+BOOTPROTO=static
+DEFROUTE=yes
+```
+
+Save the file and restart Network Interface
+
+`$ sudo systemctl restart network`
+
+Now when Network Interface is restarted, the configuration of network interface enp0s8 will already be active.
+
+### Ping the VM from the laptop
+
+Finally, I establish if the VM is indeed accessible from the host. I open a command line window on the host and use ping to verify the connection:
+
+![image](https://user-images.githubusercontent.com/71873090/153146381-d126d64a-a6fc-49f1-94a6-0419e01a722d.png)
+
+
+
 ## Build and deploy
 
 1. Clone a repository `git clone https://github.com/mentorchita/Geocit134.git; cd Geocit134`
