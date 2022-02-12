@@ -35,4 +35,4 @@ finally:
         print("sqlite connection is closed")
 
 # Executing:
-# /usr/bin/python3 /home/eugenia/python/module5/hw5.py /home/eugenia/python/module5/demo.db
+# /usr/bin/python3 /home/eugenia/DevOpsChernivtsi/PythonForDevOps/Module5/hw5.py /home/eugenia/DevOpsChernivtsi/PythonForDevOps/Module5/demo.db
