@@ -191,6 +191,8 @@ As you can see here there was a problem with obtaining dependencies.
    ./front-end/config/index.js
    ```
   
+  So in step 6, I edited all the files from the src directory.
+  
   5. Then, I found an unknown address in **application.properties** - 35.204.28.238, as you can see in below: 
   
   ```
