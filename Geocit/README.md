@@ -1,4 +1,4 @@
-# Manual deploy GeoCitizen
+# Manual deployment GeoCitizen
 
 
 ### tools&technologies
@@ -10,6 +10,8 @@
 - [Maven 3.6.3](https://linuxize.com/post/how-to-install-apache-maven-on-ubuntu-18-04/)
 - [Git 2](https://linuxize.com/post/how-to-install-git-on-ubuntu-18-04/)
 - [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-7) 
+
+> You can also follow the link above and see how to install all the tools you need for this project.
 
 
 ## Setting ip addresses
@@ -45,7 +47,9 @@ Save the file and restart Network Interface
 
 After that the configuration of network interface enp0s8 will already be active.
 
+
 #### CentOS
+
 
 Configure as a static assignment to the network interface on CentOS. To configure system to use a static IP address assignment, add the static method to the BOOTPROTO for the appropriate interface in the created file /etc/sysconfig/network-scripts. 
 
@@ -87,29 +91,35 @@ $ psql
 ```
 
 2. Add new password to **postgres** user
+
 ```# ALTER USER postgres WITH PASSWORD 'postgres';```
 
 3. Create **ss_demo_1** db to a specific postgres user
+
 ```# createdb ss_demo_1 -O postgres```
 
 ### Access to db from Ubuntu VM
 
 1.  Edit **pg_hba.conf**
+
 ``` $ sudo nano /var/lib/pgsql/data/pg_hba.conf```
 
-In IPv4 local connection change localhost to Ubuntu static IP address 192.168.1.101/24 and change method to **md5**
+In IPv4 local connection change **localhost** to Ubuntu static IP address **192.168.1.101/24** and change method to **md5**
 
 ![image](https://user-images.githubusercontent.com/71873090/153160998-5f3f0a55-3ff0-4b8e-9472-946778c55425.png)
+
+___
 
 2. Then edit **postgresql.conf**
 ``` $ sudo nano /var/lib/pgsql/data/postgresql.conf ```
 
-In listen_addresses change localhost to *.
+In listen_addresses change from **0.0.0.0** to __*__.
 
 ![image](https://user-images.githubusercontent.com/71873090/153161639-af45318b-b160-4892-a34e-5851e679b02f.png)
 
-3. After that restart PostgreSQL service for changes to take effect.
+___
 
+3. After that restart PostgreSQL service for changes to take effect.
 
 ```$ sudo systemctl restart postgresql```
 
@@ -127,10 +137,13 @@ In listen_addresses change localhost to *.
 
 2. I tried to execute `mvn install`, but received a BUILD FAILURE error:
 
- 
- ![image](https://user-images.githubusercontent.com/71873090/153762424-20d23e6f-8278-4f77-b5b3-10f8060bacbe.png)
 
-As you can see here there was a problem with obtaining dependencies. 
+> As you can see here there was a problem with downloading dependencies.
+
+ 
+ ![image](https://user-images.githubusercontent.com/71873090/153762424-20d23e6f-8278-4f77-b5b3-10f8060bacbe.png) 
+
+____
 
 3. In **pom.xml** make changes:
     
@@ -152,9 +165,15 @@ As you can see here there was a problem with obtaining dependencies.
         </repository>
     ```
 
+    | From this | To this |
+    | --------- | ------- |
+    | http://repo.spring.io/milestone | https://repo.spring.io/milestone |
+    | https://repo.spring.io/libs-milestone | https://repo.spring.io/libs-milestone
+    
     - then comment **DistributionManagement**, because I don`t use it
 
     ```
+    <!--
         <distributionManagement>
           <repository>
             <id>nexus</id>
@@ -167,9 +186,12 @@ As you can see here there was a problem with obtaining dependencies.
             <url>http://35.188.29.52:8081/repository/maven-snapshots</url>
           </snapshotRepository>
         </distributionManagement>
+        -->
     ```
-    
-  3. Also, I used the grep command to find **localhost** in all files in "Geocit134" directory:
+   
+  ___
+   
+  4. Also, I used the grep command to find **localhost** in all files in "Geocit134" directory:
    
    `grep -Ril "localhost" ./`
    
@@ -191,68 +213,81 @@ As you can see here there was a problem with obtaining dependencies.
    ./front-end/config/index.js
    ```
   
-  So in step 6, I edited all the files from the src directory.
+  > So in step 6, I edited all the files from the src directory.
   
-  5. Then, I found an unknown address in **application.properties** - 35.204.28.238, as you can see in below: 
+  ___
+  
+  5. Then, I found an unknown address in **application.properties** in _liquibase_ part - 35.204.28.238, as you can see in below: 
   
   ```
-  #liquibase
-  driver=org.postgresql.Driver
   url=jdbc:postgresql://35.204.28.238:5432/ss_demo_1
-  username=postgres
-  password=postgres
-  changeLogFile=src/main/resources/liquibase/mainChangeLog.xml
-  verbose=true
-  dropFirst=false
-  outputChangeLogFile=src/main/resources/liquibase/changeLog-NEW.postgresql.sql
+  ```
+ 
+  ```
   referenceUrl=jdbc:postgresql://35.204.28.238:5432/ss_demo_1_test
-  diffChangeLogFile=src/main/resources/liquibase/diffChangeLog.yaml
-  referenceUsername=${db.username}
-  referencePassword=${db.password}
-  spring.liquibase.change-log=src/main/resources/liquibase/structure.yaml
   ```
   
-  So I decided to change it to a new IP address of the database so that liquibase could access the new database. I did it in the next step.
+  > So I decided to change it to a new IP address of the database so that ***liquibase*** could access the new database.
+
+| From this | To this |
+| --------- | ------- |
+| jdbc:postgresql://35.204.28.238:5432/ss_demo_1 | jdbc:postgresql://192.168.1.102:5432/ss_demo_1 |
+| jdbc:postgresql://35.204.28.238:5432/ss_demo_1_test | jdbc:postgresql://35.204.28.238:5432/ss_demo_1_test |
+
+ ___
 
   6. Write __fix.sh__ to change old IP addresses or localhost`s in Geocit134/src directory to new ones and update email credentials: 
-  
-  ```
-  #!/bin/bash
+     1. Remove old project files from tomcat:
+     
+     ```
+      sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen.war
+      sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
+     ```
+     
+     2.  Update email credentials
+     
+     ```
+      email='example@gmail.com'
+      emailpasswd='passwd'
 
-  # Remove old project files from tomcat
-  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen.war
-  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
+      sed -i "s/ssgeocitizen@gmail.com/$email/g" ~/Geocit134/src/main/resources/application.properties
+      sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.proper
+     ```
+  
+     3.  Change old IP addresses to new ones:
 
-  #----------------------------------------------------------------------------------------------------
-  # Update email credentials
-  email='example@gmail.com'
-  emailpasswd='passwd'
+     ```
+      serverip = 192.168.65.101
+      dbip = 192.168.65.102
 
-  sed -i "s/ssgeocitizen@gmail.com/$email/g" ~/Geocit134/src/main/resources/application.properties
-  sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.properties
+      sed -i "s/http:\/\/localhost/http:\/\/$serverip/g" ~/Geocit134/src/main/resources/application.properties
+      sed -i "s/postgresql:\/\/localhost/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
+      sed -i "s/postgresql:\/\/35.204.28.238/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
+     ```
+     
+     4. Correct path to js folder
+ 
+      ```
+      sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
+      ```
+      
+     5. Change localhost to database ip
+ 
+     ```
+     sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java  
+     ```
+  
+     6. Change localhost to server ip
 
-  #----------------------------------------------------------------------------------------------------
-  # Change old IP addresses to new ones
-  serverip = 192.168.65.101
-  dbip = 192.168.65.102
-  
-  sed -i "s/http:\/\/localhost/http:\/\/$serverip/g" ~/Geocit134/src/main/resources/application.properties
-  sed -i "s/postgresql:\/\/localhost/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
-  sed -i "s/postgresql:\/\/35.204.28.238/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
-  
-  # Correct path to js folder
-  sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
-  
-  # Change localhost to database ip
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java   
-  
-   # Change localhost to server ip
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
-  ```
-  
+     ```
+     sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
+     sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
+     sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
+     sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
+     ```
+   
+  ____
+   
   7. And write script for build and deploy project __start.sh__
   
   ```
@@ -264,6 +299,8 @@ As you can see here there was a problem with obtaining dependencies.
   sleep 1
   sudo sh /opt/tomcat/latest/bin/startup.sh
   ```
+  
+  ____
   
   8. Write __db.sh__ script for cleanig and creating database:
   
@@ -278,4 +315,4 @@ As you can see here there was a problem with obtaining dependencies.
   psql --host=$dbhost --port=$dbport --username=$dbuser -c 'CREATE DATABASE ss_demo_1;'
   ```
   
-  9. Then open http://192.168.1.101:8080/citizen/
+  9. Then open **http://192.168.1.101:8080/citizen/**
