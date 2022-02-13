@@ -1,10 +1,10 @@
-# Geo Citizen
+# Manual deploy GeoCitizen
 
 
 ### tools&technologies
 
 - [Ubuntu Server 18.04](https://losst.ru/ustanovka-ubuntu-server-18-04)
-- [CentOS 7.9](https://www.linuxshelltips.com/install-centos-on-virtualbox/)
+- [CentOS 7.9](https://linuxhint.com/install-centos-7-virtualbox/)
 - [Java 8](https://tecadmin.net/install-oracle-java-8-ubuntu-via-ppa/)
 - [Tomcat 9](https://linuxize.com/post/how-to-install-tomcat-9-on-ubuntu-18-04/)
 - [Maven 3.6.3](https://linuxize.com/post/how-to-install-apache-maven-on-ubuntu-18-04/)
@@ -12,17 +12,13 @@
 - [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-7) 
 
 
-
 ## Setting ip addresses
 
 ### Define Host Only Ethernet Adapter in Virtual Box on my laptop
 
  In the VirtualBox client, open menu option File | Host Network Manager. Create a new Virtual Box Host Only Ethernet Adapter (in my case #2). Set an IP address in the range in which you want to assign an IP address to your VM. I have set 192.168.1.100 and I will assign the IP address 192.168.1.101 to the Ubuntu VM and 192.168.1.102 CentOs VM. Do not define a DHCP Server on the second tab.
- 
- №№№№№№№№№№
-  In the VirtualBox client, open menu option File | Host Network Manager. Create a new Virtual Box Host Only Ethernet Adapter (in my case #3). Set an IP address in the range in which you want to assign an IP address to your VM. I have set 192.168.65.100 and I will assign the IP address 192.168.65.101 to the Ubuntu VM and 192.168.65.102 CentOs VM. Do not define a DHCP Server on the second tab.
-  
-  ![image](https://user-images.githubusercontent.com/71873090/153747668-5b4020ae-6e2f-4151-b313-041b2a3ae459.png)
+
+  ![image](https://user-images.githubusercontent.com/71873090/153762323-744f571c-15d8-493f-8e3d-264929af0cf5.png)
 
  
 ### Enable a network adapter for the specific VM of type Virtual Box Host Only Ethernet Adapter  
@@ -128,21 +124,17 @@ In listen_addresses change localhost to *.
 ## Build and deploy
 
 1. Clone a repository `git clone https://github.com/mentorchita/Geocit134.git; cd Geocit134`
-2. In **pom.xml** make changes:
 
-    - add javax in \<artifacrId\>
+2. I tried to execute `mvn install`, but received a BUILD FAILURE error:
+
+ 
+ ![image](https://user-images.githubusercontent.com/71873090/153762424-20d23e6f-8278-4f77-b5b3-10f8060bacbe.png)
+
+As you can see here there was a problem with obtaining dependencies. 
+
+3. In **pom.xml** make changes:
     
-    ```
-    <!--Servlet API-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    ```
-    
-    - Update the repository url to use HTTPS. Something like this:
+    - Update the repository url to use HTTPS. Because as of January 15, 2020, the central repository no longer supports over HTTP and requires that requests to the repository be transmitted over HTTPS. As you can see below:
 
     ```
         <repository>
@@ -160,7 +152,7 @@ In listen_addresses change localhost to *.
         </repository>
     ```
 
-    - comment **DistributionManagement**
+    - then comment **DistributionManagement**, because I don`t use it
 
     ```
         <distributionManagement>
@@ -176,8 +168,51 @@ In listen_addresses change localhost to *.
           </snapshotRepository>
         </distributionManagement>
     ```
+    
+  3. Also, I used the grep command to find **localhost** in all files in "Geocit134" directory:
+   
+   `grep -Ril "localhost" ./`
+   
+   And received such a conclusion:
+   
+   ```
+   ./src/main/webapp/static/js/app.6313e3379203ca68a255.js.map                                             
+   ./src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js                                              
+   ./src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map                                          
+   ./src/main/webapp/static/js/app.6313e3379203ca68a255.js                                                 
+   ./src/main/resources/application.properties                                                             
+   ./src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java                              
+   ./README.md
+   ./front-end/src/components/map/main.js                                                                  
+   ./front-end/src/main.js                                                                                 
+   ./front-end/test/e2e/nightwatch.conf.js                                                                 
+   ./front-end/test/e2e/specs/test.js                                                                      
+   ./front-end/README.md                                                                                   
+   ./front-end/config/index.js
+   ```
   
-  3. Write __fix.sh__ to upload all 'localhost' to new ip address 
+  5. Then, I found an unknown address in **application.properties** - 35.204.28.238, as you can see in below: 
+  
+  ```
+  #liquibase
+  driver=org.postgresql.Driver
+  url=jdbc:postgresql://35.204.28.238:5432/ss_demo_1
+  username=postgres
+  password=postgres
+  changeLogFile=src/main/resources/liquibase/mainChangeLog.xml
+  verbose=true
+  dropFirst=false
+  outputChangeLogFile=src/main/resources/liquibase/changeLog-NEW.postgresql.sql
+  referenceUrl=jdbc:postgresql://35.204.28.238:5432/ss_demo_1_test
+  diffChangeLogFile=src/main/resources/liquibase/diffChangeLog.yaml
+  referenceUsername=${db.username}
+  referencePassword=${db.password}
+  spring.liquibase.change-log=src/main/resources/liquibase/structure.yaml
+  ```
+  
+  So I decided to change it to a new IP address of the database so that liquibase could access the new database. I did it in the next step.
+
+  6. Write __fix.sh__ to change old IP addresses or localhost`s in Geocit134/src directory to new ones and update email credentials: 
   
   ```
   #!/bin/bash
@@ -195,7 +230,7 @@ In listen_addresses change localhost to *.
   sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.properties
 
   #----------------------------------------------------------------------------------------------------
-  # Change localhost to 192.168.1.101
+  # Change old IP addresses to new ones
   serverip = 192.168.65.101
   dbip = 192.168.65.102
   
@@ -206,26 +241,29 @@ In listen_addresses change localhost to *.
   # Correct path to js folder
   sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
   
+  # Change localhost to database ip
   sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java   
+  
+   # Change localhost to server ip
   sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
   sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
   sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
   sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
   ```
   
-  4. And write script for build and deploy project __start.sh__
+  7. And write script for build and deploy project __start.sh__
   
   ```
   #!/bin/bash
 
   mvn install
-  sleep 5
+  sleep 1
   sudo mv target/citizen.war /opt/tomcat/latest/webapps/ 
-  sleep 5
+  sleep 1
   sudo sh /opt/tomcat/latest/bin/startup.sh
   ```
   
-  5. Write __db.sh__ script for cleanig and creating database:
+  8. Write __db.sh__ script for cleanig and creating database:
   
   ```
   #!bin/bash
@@ -238,4 +276,4 @@ In listen_addresses change localhost to *.
   psql --host=$dbhost --port=$dbport --username=$dbuser -c 'CREATE DATABASE ss_demo_1;'
   ```
   
-  6. Then open http://192.168.65.101:8080/citizen/
+  9. Then open http://192.168.1.101:8080/citizen/
