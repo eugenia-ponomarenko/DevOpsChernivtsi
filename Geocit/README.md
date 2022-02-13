@@ -3,13 +3,14 @@
 
 ### tools&technologies
 
-
-- [Git 2](https://linuxize.com/post/how-to-install-git-on-ubuntu-18-04/)
-- [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-7) 
+- [Ubuntu Server 18.04](https://losst.ru/ustanovka-ubuntu-server-18-04)
+- [CentOS 7.9](https://www.linuxshelltips.com/install-centos-on-virtualbox/)
+- [Java 8](https://tecadmin.net/install-oracle-java-8-ubuntu-via-ppa/)
 - [Tomcat 9](https://linuxize.com/post/how-to-install-tomcat-9-on-ubuntu-18-04/)
 - [Maven 3.6.3](https://linuxize.com/post/how-to-install-apache-maven-on-ubuntu-18-04/)
-- [Ubuntu 18.04](https://codebots.com/docs/ubuntu-18-04-virtual-machine-setup)
-- [CentOS 7.9](https://linuxhint.com/install-centos-7-virtualbox/)
+- [Git 2](https://linuxize.com/post/how-to-install-git-on-ubuntu-18-04/)
+- [PostgreSQL](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-7) 
+
 
 
 ## Setting ip addresses
@@ -18,9 +19,15 @@
 
  In the VirtualBox client, open menu option File | Host Network Manager. Create a new Virtual Box Host Only Ethernet Adapter (in my case #2). Set an IP address in the range in which you want to assign an IP address to your VM. I have set 192.168.1.100 and I will assign the IP address 192.168.1.101 to the Ubuntu VM and 192.168.1.102 CentOs VM. Do not define a DHCP Server on the second tab.
  
+ №№№№№№№№№№
+  In the VirtualBox client, open menu option File | Host Network Manager. Create a new Virtual Box Host Only Ethernet Adapter (in my case #3). Set an IP address in the range in which you want to assign an IP address to your VM. I have set 192.168.65.100 and I will assign the IP address 192.168.65.101 to the Ubuntu VM and 192.168.65.102 CentOs VM. Do not define a DHCP Server on the second tab.
+  
+  ![image](https://user-images.githubusercontent.com/71873090/153747668-5b4020ae-6e2f-4151-b313-041b2a3ae459.png)
+
+ 
 ### Enable a network adapter for the specific VM of type Virtual Box Host Only Ethernet Adapter  
 
-Select the VM in the Virtual Box client – before it is started. Press Settings. Click on Network. Open one of the currently unconfigured Adapter tabs. Select the Host Only Ethernet Adapter that was created in the previous step, #2 for me. Check Enable the Network Adapter. Make sure that Promiscuous Mode allows VMs and the checkbox Cable Connected is checked.
+Select the VM in the Virtual Box client – before it is started. Press Settings. Click on Network. Open one of the currently unconfigured Adapter tabs. Select the Host Only Ethernet Adapter that was created in the previous step, #3 for me. Check Enable the Network Adapter. Make sure that Promiscuous Mode allows VMs and the checkbox Cable Connected is checked.
 
 #### Ubuntu 
 
@@ -170,7 +177,55 @@ In listen_addresses change localhost to *.
         </distributionManagement>
     ```
   
-  3. Write __db.sh__ script for cleanig and creating database:
+  3. Write __fix.sh__ to upload all 'localhost' to new ip address 
+  
+  ```
+  #!/bin/bash
+
+  # Remove old project files from tomcat
+  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen.war
+  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
+
+  #----------------------------------------------------------------------------------------------------
+  # Update email credentials
+  email='example@gmail.com'
+  emailpasswd='passwd'
+
+  sed -i "s/ssgeocitizen@gmail.com/$email/g" ~/Geocit134/src/main/resources/application.properties
+  sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.properties
+
+  #----------------------------------------------------------------------------------------------------
+  # Change localhost to 192.168.1.101
+  serverip = 192.168.65.101
+  dbip = 192.168.65.102
+  
+  sed -i "s/http:\/\/localhost/http:\/\/$serverip/g" ~/Geocit134/src/main/resources/application.properties
+  sed -i "s/postgresql:\/\/localhost/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
+  sed -i "s/postgresql:\/\/35.204.28.238/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
+  
+  # Correct path to js folder
+  sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
+  
+  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java   
+  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
+  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
+  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
+  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
+  ```
+  
+  4. And write script for build and deploy project __start.sh__
+  
+  ```
+  #!/bin/bash
+
+  mvn install
+  sleep 5
+  sudo mv target/citizen.war /opt/tomcat/latest/webapps/ 
+  sleep 5
+  sudo sh /opt/tomcat/latest/bin/startup.sh
+  ```
+  
+  5. Write __db.sh__ script for cleanig and creating database:
   
   ```
   #!bin/bash
@@ -183,44 +238,4 @@ In listen_addresses change localhost to *.
   psql --host=$dbhost --port=$dbport --username=$dbuser -c 'CREATE DATABASE ss_demo_1;'
   ```
   
-  4. Write __fix.sh__ to upload all 'localhost' to new ip address 
-  
-  ```
-  #!/bin/bash
-
-  # Remove old project files from tomcat
-  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen.war
-  sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
-
-  #----------------------------------------------------------------------------------------------------
-  # Update email credentials
-  email='my.mail0001my@gmail.com'
-  emailpasswd='devOps1324@'
-
-  sed -i "s/ssgeocitizen@gmail.com/$email/g" ~/Geocit134/src/main/resources/application.properties
-  sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.properties
-
-  #----------------------------------------------------------------------------------------------------
-  # Change localhost to 192.168.1.101
-
-  sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
-
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
-  sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
-  ```
-  
-  5. And write script for build and deploy project __start.sh__
-  
-  ```
-  #!/bin/bash
-
-  mvn install
-  sleep 5
-  sudo mv target/citizen.war /opt/tomcat/latest/webapps/ 
-  sleep 5
-  sudo sh /opt/tomcat/latest/bin/startup.sh
-  ```
-  
-  6. Then open http://192.168.1.101:8080/citizen/
+  6. Then open http://192.168.65.101:8080/citizen/
