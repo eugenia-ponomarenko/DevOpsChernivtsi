@@ -316,3 +316,5 @@ ____
   ```
   
   9. Then open **http://192.168.1.101:8080/citizen/**
+
+![image](https://user-images.githubusercontent.com/71873090/153773261-7481e36f-1f27-4324-9073-6ba41e040771.png)
