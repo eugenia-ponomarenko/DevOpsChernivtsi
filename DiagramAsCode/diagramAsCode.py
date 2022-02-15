@@ -1,5 +1,3 @@
-# file name GeocitDiagram.py
-from re import I
 from diagrams import Diagram, Cluster, Edge
 from diagrams.aws.compute import EC2
 from diagrams.custom import Custom
@@ -11,7 +9,6 @@ from diagrams.onprem.client import User, Users
 from diagrams.onprem.database import PostgreSQL
 from diagrams.onprem.network import Tomcat
 from diagrams.programming.language import Java
-
 
 
 with Diagram(filename="GeoCitizen2", show=False):
