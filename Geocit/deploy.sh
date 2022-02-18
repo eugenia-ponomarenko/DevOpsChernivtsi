@@ -14,8 +14,8 @@ sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
 
 #----------------------------------------------------------------------------------------------------
 # Change old IP addresses to new ones
-serverip = 192.168.65.101
-dbip = 192.168.65.102
+serverip='172.31.18.225'
+dbip='geocit-db.cstswihxzihx.eu-central-1.rds.amazonaws.com'
 
 sed -i "s/http:\/\/192.168.65.101/http:\/\/$serverip/g" ~/Geocit134/src/main/resources/application.properties
 sed -i "s/postgresql:\/\/192.168.65.102/postgresql:\/\/$dbip/g" ~/Geocit134/src/main/resources/application.properties
@@ -23,11 +23,11 @@ sed -i "s/postgresql:\/\/192.168.65.102/postgresql:\/\/$dbip/g" ~/Geocit134/src/
 # Correct path to js folder
 sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
 
-sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java   
-sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
-sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
-sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
-sed -i "s/localhost/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
+sed -i "s/192.168.65.101/$serverip/g" ~/Geocit134/src/main/java/com/softserveinc/geocitizen/configuration/MongoConfig.java   
+sed -i "s/192.168.65.101/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js
+sed -i "s/192.168.65.101/$serverip/g" ~/Geocit134/src/main/webapp/static/js/app.6313e3379203ca68a255.js.map
+sed -i "s/192.168.65.101/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js
+sed -i "s/192.168.65.101/$serverip/g" ~/Geocit134/src/main/webapp/static/js/vendor.9ad8d2b4b9b02bdd427f.js.map
 
 #-----------------------------------------------------------------------------------------------------
 # build and deploy
