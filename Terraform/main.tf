@@ -85,7 +85,7 @@ resource "aws_key_pair" "aws_key" {
 
 # ----------------------------------------------
 # ------------------ RDS -----------------------
-resource "aws_db_instance" "GeoCitizen-db" {
+resource "aws_db_instance" "GeoCitizenDB" {
   allocated_storage      = 10
   engine                 = "postgres"
   engine_version         = "12.9"
@@ -166,6 +166,6 @@ resource "aws_iam_policy_attachment" "attach_policy" {
 }
 
 resource "aws_iam_instance_profile" "geocit_profile" {
-  name = "geocit_profile"
+  name = "geoCitizen"
   role = aws_iam_role.geocit_accessToRDS.name
 }

@@ -5,9 +5,31 @@ resource "local_file" "private_key" {
 }
 
 resource "local_file" "ansible_inventory" {
-  content = templatefile("inventory.tmpl", {
-      ip          = aws_instance.ubuntu_web_server.public_ip,
-      ssh_keyfile = local_file.private_key.filename
-  })
-  filename = format("%s/%s", abspath(path.root), "inventory.yaml")
+  filename = format("%s/%s/%s", abspath(path.root), "inventory", "inventory.yaml")
+  file_permission   = "0600"
+  content = <<EOF
+ubuntu_server:
+  hosts:
+    ansible_host: ${aws_instance.ubuntu_web_server.public_ip} 
+  vars:
+    ansible_ssh_user: ubuntu
+    ansible_ssh_private_key_file: ${local_file.private_key.filename}
+
+postgres_database:
+  hosts:
+    db_host: ${aws_db_instance.GeoCitizenDB.endpoint}
+  vars:
+    db_user: ${aws_db_instance.GeoCitizenDB.username}
+    db_password: ${aws_db_instance.GeoCitizenDB.password}
+    db_name: ${aws_db_instance.GeoCitizenDB.db_name}
+EOF
+}
+
+resource "local_file" "credentials" {
+  filename = format("%s/%s/%s", abspath(path.root), "details", "credentials")
+  file_permission   = "0600"
+  content = <<EOF
+ubuntu_host="${aws_instance.ubuntu_web_server.public_ip}"
+db_host="${aws_db_instance.GeoCitizenDB.endpoint}"
+EOF
 }
