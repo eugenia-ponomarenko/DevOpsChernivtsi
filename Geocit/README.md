@@ -1,4 +1,4 @@
-# Manual deployment GeoCitizen on a localhost
+# Manual deployment GeoCitizen on a local machine
 
 
 ### tools&technologies
