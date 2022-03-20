@@ -21,7 +21,9 @@
    6. Configure Security Group
    
   ![image](https://user-images.githubusercontent.com/71873090/159160959-24765c9d-07f7-4020-a569-bb6e6ca8ba16.png)
-    
+
+**Important**
+> I used port 587  because it is now preferred over port 25 in mail, because it's this authentication mechanism that prevents the propagation of spam and malware submissions. 
     
 4. Create RDS instance with:
    1. Engine type -  **PostgreSQL**, version - PostgreSQL 12.9-R1 (because 13 version and more aren`t available in free tier)
