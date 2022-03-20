@@ -1,6 +1,4 @@
-
-  GNU nano 2.9.3                             deploy.sh
-
+```
 #!/bin/bash
 
 # Remove old project files from tomcat
@@ -39,3 +37,4 @@ sleep 5
 sudo mv target/citizen.war /opt/tomcat/latest/webapps/
 sleep 5
 sudo sh /opt/tomcat/latest/bin/startup.sh
+```
