@@ -1,5 +1,7 @@
 # Manual Deployment GeoCitizen on AWS
 
+## Creating the right infrastructure on AWS
+
 1. First of all, I choose region - **Europe (Frankfurt)**, as use only free tier resources and create RDS instance. RDS instance in free tier is available only in region with t2.micro instances in free tier. 
 2. Create IAM role for EC2 instance for full access to RDS - **geocit-app**:
    1. Add permissions - policy **FullAccessToRDS**
@@ -30,5 +32,45 @@
    7. Database authentication - **Password and IAM database authentication**4
    8. Additional configuration: Initial database name - **ss_demo_1**
    9. Other settings as a default.
-5. Configure Security Group for RDS instance. Just open PostgreSQL port in inbound rules for access from EC2 instance.
+5. Configure Security Group for RDS instance. Just open **PostgreSQL port (5432)** in _inbound rules_ for access from EC2 instance.
 
+## EC2 instance configuring
+1. Install Java 8
+
+```console
+sudo apt-get update
+sudo apt-get install openjdk-8-jdk
+```
+
+Verify the version of the JDK: 
+```console
+java -version
+```
+
+```
+openjdk version "1.8.0_242"
+OpenJDK Runtime Environment (build 1.8.0_242-b09)
+OpenJDK 64-Bit Server VM (build 25.242-b09, mixed mode)
+```
+
+2. Next, install Maven by typing the following command:
+
+```console
+sudo apt install maven
+```
+
+Verify the installation by running the mvn -version command:
+```console
+mvn -version
+```
+The output should look something like this:
+```
+Apache Maven 3.5.2
+Maven home: /usr/share/maven
+Java version: 10.0.2, vendor: Oracle Corporation
+Java home: /usr/lib/jvm/java-11-openjdk-amd64
+Default locale: en_US, platform encoding: ISO-8859-1
+OS name: "linux", version: "4.15.0-36-generic", arch: "amd64", family: "unix"
+```
+
+3. [Tomcat install](https://linuxize.com/post/how-to-install-tomcat-9-on-ubuntu-18-04/)
