@@ -20,7 +20,8 @@
 
    6. Configure Security Group
    
-   ![image](https://user-images.githubusercontent.com/71873090/159156935-b10cae0a-0246-4ee8-936b-db1824f5a465.png)
+  ![image](https://user-images.githubusercontent.com/71873090/159160959-24765c9d-07f7-4020-a569-bb6e6ca8ba16.png)
+    
     
 4. Create RDS instance with:
    1. Engine type -  **PostgreSQL**, version - PostgreSQL 12.9-R1 (because 13 version and more aren`t available in free tier)
@@ -74,3 +75,46 @@ OS name: "linux", version: "4.15.0-36-generic", arch: "amd64", family: "unix"
 ```
 
 3. [Tomcat install](https://linuxize.com/post/how-to-install-tomcat-9-on-ubuntu-18-04/)
+
+## Build and deploy
+
+1. Clone a repository `git clone https://github.com/mentorchita/Geocit134.git; cd Geocit134`
+2. Create bash script to fix pom.xml, update ip addresses and deploy GeoCitizen on Tomcat:
+
+```bash
+#!/bin/bash
+
+# Remove old project files from tomcat
+sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen.war
+sudo rm -rf /opt/tomcat/apache-tomcat-9.0.58/webapps/citizen
+
+#----------------------------------------------------------------------------------------------------
+# Update email credentials
+email='example@gmail.com'
+emailpasswd='passwd'
+
+sed -i "s/ssgeocitizen@gmail.com/$email/g" ~/Geocit134/src/main/resources/application.properties
+sed -i "s/=softserve/=$emailpasswd/g" ~/Geocit134/src/main/resources/application.properties
+
+# Correct path to js folder
+sed -i "s/\/src\/assets/\.\/static/g" ~/Geocit134/src/main/webapp/index.html
+
+old_serverip="18.159.149.79"
+new_serverip="3.70.135.117"
+
+old_dbip="192.168.65.102"
+new_dbip="geocit-db.cstswihxzihx.eu-central-1.rds.amazonaws.com"
+
+grep -Ril "$old_serverip" | xargs sudo sed -i "s/$old_serverip/$new_serverip/g"
+grep -Ril "$old_dbip" | xargs sudo sed -i "s/$old_dbip/$new_dbip/g"
+
+#-----------------------------------------------------------------------------------------------------
+# build and deploy
+
+mvn install
+sleep 5
+sudo mv target/citizen.war /opt/tomcat/latest/webapps/ 
+sleep 5
+sudo sh /opt/tomcat/latest/bin/startup.sh
+
+```
