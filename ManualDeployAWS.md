@@ -19,6 +19,11 @@
    ![image](https://user-images.githubusercontent.com/71873090/158358124-de352a7c-9408-4dd5-8475-7d5e677e4f5c.png)
 
    6. Configure Security Group
+> port 8080 - for Tomcat
+> 
+> port 22 - SSH
+> 
+> port 587 - SMTP for GMAIL
    
   ![image](https://user-images.githubusercontent.com/71873090/159160959-24765c9d-07f7-4020-a569-bb6e6ca8ba16.png)
 
