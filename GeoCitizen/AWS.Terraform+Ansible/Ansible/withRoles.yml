@@ -29,7 +29,7 @@
   - name: Copy files from local to remote
     copy:
       src: "{{ item }}"
-      dest: ~/ # /home/ubuntu/
+      dest: ~/
       mode: 0777
     with_items:
       - "~/DevOpsChernivtsi/GeoCitizen/AWS.Terraform+Ansible/emailCredentials"

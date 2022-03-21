@@ -9,7 +9,6 @@ provider "aws" {
   profile = "default"
 }
 
-
 # ----------------------------------------------
 # ------------------ EC2 -----------------------
 
@@ -46,14 +45,6 @@ resource "aws_security_group" "ubuntuSecurityGroup" {
   }
 
   ingress {
-    description = "PostgreSQL"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
     description = "SMTP for GMAIL"
     from_port   = 587
     to_port     = 587
@@ -68,7 +59,6 @@ resource "aws_security_group" "ubuntuSecurityGroup" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
 
 # ----------------------------------------------
 #---------------- Key pair ---------------------
