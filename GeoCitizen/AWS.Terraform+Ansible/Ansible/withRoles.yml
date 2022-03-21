@@ -12,24 +12,24 @@
     ui_admin_username: janedo                  
     ui_admin_pass: passwd         
 
-  roles:
-    - tomcat9
+  # roles:
+  #   - tomcat9
   
   tasks:
-  - name: Install Maven, Git
-    become: yes
-    apt:
-      name: "{{ packages }}"
-      state: present
-    vars:
-      packages:
-          - maven
-          - git
+  # - name: Install Maven, Git
+  #   become: yes
+  #   apt:
+  #     name: "{{ packages }}"
+  #     state: present
+  #   vars:
+  #     packages:
+  #         - maven
+  #         - git
 
   - name: Copy files from local to remote
     copy:
       src: "{{ item }}"
-      dest: ~/
+      dest: ~/ # /home/ubuntu/
       mode: 0777
     with_items:
       - "~/DevOpsChernivtsi/GeoCitizen/AWS.Terraform+Ansible/emailCredentials"
@@ -37,12 +37,4 @@
 
   - name: Execute cleanDeploy.sh
     script: ~/DevOpsChernivtsi/GeoCitizen/AWS.Terraform+Ansible/cleanD.sh
-
-  # - name: Move citizen.war to tomcat9
-  #   command: cd ~/Geocit134/; mvn install
-
-  # - name: Move citizen.war to tomcat9
-  #   command: mv target/citizen.war /usr/share/tomcat/webapps/ 
-
-  # - name: Start tomcat script
-  #   command: sh /usr/share/tomcat/bin/startup.sh
+      
