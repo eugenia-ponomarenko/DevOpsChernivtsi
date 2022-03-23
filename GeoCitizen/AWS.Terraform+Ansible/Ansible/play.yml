@@ -6,10 +6,10 @@
   remote_user: ubuntu
   vars:
     tomcat_ver: 9.0.60                         
-    ui_manager_user: {{ login }}                   
-    ui_manager_pass: {{ passwd }}               
-    ui_admin_username: {{ login }}              
-    ui_admin_pass: {{ passwd }}          
+    ui_manager_user: login                    
+    ui_manager_pass: passwd               
+    ui_admin_username: login              
+    ui_admin_pass: passwd         
 
   tasks:
   - name: Update and upgrade apt packages
@@ -52,13 +52,13 @@
     group:
       name: tomcat
 
-  # - name: Add "tomcat" user
-  #   user:
-  #     name: tomcat
-  #     group: tomcat
-  #     home: /usr/share/tomcat
-  #     createhome: no
-  #     system: yes
+  - name: Add "tomcat" user
+    user:
+      name: tomcat
+      group: tomcat
+      home: /usr/share/tomcat
+      createhome: no
+      system: yes
 
   - name: Download Tomcat
     get_url:
