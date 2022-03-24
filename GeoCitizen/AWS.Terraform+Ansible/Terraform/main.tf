@@ -4,6 +4,11 @@ locals {
   instance_type = "t2.micro"
 }
 
+variable "ec2_ports" {
+  type    = list(number)
+  default = [22, 8080, 587]
+}
+
 provider "aws" {
   region  = "eu-central-1"
   profile = "default"
@@ -17,7 +22,7 @@ resource "aws_instance" "ubuntu_web_server" {
   instance_type          = local.instance_type
   vpc_security_group_ids = [aws_security_group.ubuntuSecurityGroup.id]
   iam_instance_profile   = aws_iam_instance_profile.geocit_profile.name
-  key_name               = aws_key_pair.aws_key.key_name
+  key_name               = local.key_name
   tags = {
     Name = "Ubuntu-WebServer"
   }
@@ -27,29 +32,14 @@ resource "aws_instance" "ubuntu_web_server" {
 resource "aws_security_group" "ubuntuSecurityGroup" {
   name        = "WebServer Security Group"
   description = "GeoCitizen. SecurityGroup for Ubuntu"
-
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "Tomcat"
-    from_port   = 8080
-    to_port     = 8080
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "SMTP for GMAIL"
-    from_port   = 587
-    to_port     = 587
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = var.ec2_ports
+    content {
+      from_port        = ingress.value
+      to_port          = ingress.value
+      protocol         = "tcp"
+      cidr_blocks      = ["0.0.0.0/0"]
+    }
   }
 
   egress {
@@ -59,19 +49,6 @@ resource "aws_security_group" "ubuntuSecurityGroup" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# ----------------------------------------------
-#---------------- Key pair ---------------------
-resource "tls_private_key" "key" {
- algorithm = "RSA"
- rsa_bits  = 2048
-}
- 
-resource "aws_key_pair" "aws_key" {
- key_name   = "ssh-key"
- public_key = tls_private_key.key.public_key_openssh
-}
-
 
 # ----------------------------------------------
 # ------------------ RDS -----------------------
