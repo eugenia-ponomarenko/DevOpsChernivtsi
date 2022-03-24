@@ -91,7 +91,6 @@ resource "aws_security_group" "RDS_SecurityGroup" {
 
 resource "aws_iam_role" "geocit_accessToRDS" {
   name = "Geocit-AccessToRDS"
-
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
