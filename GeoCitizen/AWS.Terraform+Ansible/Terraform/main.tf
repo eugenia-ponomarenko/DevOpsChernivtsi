@@ -108,27 +108,10 @@ resource "aws_iam_role" "geocit_accessToRDS" {
 EOF
 }
 
-resource "aws_iam_policy" "fullAccessToRDS" {
-  name        = "FullAccessToRDS"
-  description = "A test policy"
-  policy      = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "rds:*",
-            "Resource": "*"
-        }
-    ]
-}
-EOF  
-}
-
 resource "aws_iam_policy_attachment" "attach_policy" {
   name       = "policy_attachment"
   roles      = ["${aws_iam_role.geocit_accessToRDS.name}"]
-  policy_arn = aws_iam_policy.fullAccessToRDS.arn
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
 }
 
 resource "aws_iam_instance_profile" "geocit_profile" {
