@@ -7,7 +7,7 @@ ubuntu_server:
     ${aws_instance.ubuntu_web_server.public_ip} 
   vars:
     ansible_ssh_user: ubuntu
-    ansible_ssh_private_key_file: ~/DevOpsChernivtsi/GeoCitizen/AWS.Terraform+Ansible/Terraform/.ssh/ssh-key.pem
+    ansible_ssh_private_key_file: ~/DevOpsChernivtsi/GeoCitizen/AWS.Terraform+Ansible/.ssh/ansible-ssh-key.pem
     ansible_python_interpreter: /usr/bin/python3
 EOF
 }
