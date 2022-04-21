@@ -1,0 +1,25 @@
+version: "3.3"
+
+services:
+  db:
+    container_name: postgres
+    image: postgres
+    volumes: 
+       - ./data/postgres:/var/lib/postgresql/data
+    env_file:
+      - ./postgres.env
+    ports:
+      - 5432:5432
+    restart: always
+
+  webserver:
+    depends_on:
+       - db
+    container_name: tomcat
+    image: tomcat:9.0.62-jdk11-temurin-focal
+    volumes:
+      - ./SSITA-GeoCitizen-AWS/target/citizen:/usr/local/tomcat/webapps/citizen
+    ports:
+      - 80:8080
+      - 587:587
+    restart: always
