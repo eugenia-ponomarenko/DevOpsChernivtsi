@@ -7,8 +7,8 @@ git clone https://github.com/eugenia-ponomarenko/GeoCitizen.git
 
 #----------------------------------------------------------------------------------------------------
 # Change email creds
-email="my.mail0001my@gmail.com" 
-password="vlsjlvwwocwxqzeb"
+email="example@gmail.com" 
+password="passwd"
 server_ip="$(curl ifconfig.me)"
 
 sed -i "s/[a-z0-9.]\{5,\}@gmail\.com/$email/g" GeoCitizen/src/main/resources/application.properties
