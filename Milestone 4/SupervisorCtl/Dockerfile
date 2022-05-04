@@ -60,12 +60,8 @@ COPY  ./GeoCitizen/target/citizen /usr/local/tomcat/webapps/citizen
 
 EXPOSE 9001/tcp 8080/tcp 5432/tcp
 
-# CMD ["catalina.sh", "run"]
 CMD ["/usr/bin/supervisord"]
 
 ##################### Execute the following commands #####################
 # sudo DOCKER_BUILDKIT=1 docker build . -t supervisor_geocit_1 --no-cache
 # sudo docker run --name supervisor_geocitizen_1 -p 9001:9001 -p 8080:8080 -p 5432:5432 -d supervisor_geocit_1:latest
-
-##################### problems #####################
-# the --chmod option requires BuildKit. Refer to https://docs.docker.com/go/buildkit/ to learn how to build images with BuildKit enabled
